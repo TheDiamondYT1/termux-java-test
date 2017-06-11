@@ -14,6 +14,11 @@ echo
 rm -rf $DIR &>/dev/null
 mkdir $DIR &>/dev/null
 
+echo "Checking device details..."
+echo " Arch: $(getprop ro.product.cpu.abi)"
+
+echo
+
 echo "Checking test dependencies..."
 # Java
 echo -n " java..."
@@ -58,7 +63,7 @@ if [ "$MAVEN" == "no" ]; then
     echo "Maven v3.5.0"
     
     echo -n " Downloading..."
-    cd $DIR && $(curl -Ls http://mirrors.ukfast.co.uk/sites/ftp.apache.org/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz > maven-3.5.0-bin.tar.gz)
+    cd $DIR && curl -Ls http://mirrors.ukfast.co.uk/sites/ftp.apache.org/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz > maven-3.5.0-bin.tar.gz
     if [ ! -f "$DIR/maven-3.5.0-bin.tar.gz" ]; then
         echo -e "failed"
     else 
@@ -66,9 +71,9 @@ if [ "$MAVEN" == "no" ]; then
     fi
     
     echo -n " Setting up..."
-    tar -zxf $DIR/maven-3.5.0.tar.gz maven &>/dev/null
-    export PATH=$PATH:$DIR/maven/bin
-    termux-fix-shebang $DIR/maven/bin/mvn
+    cd $DIR && tar -zxf maven-3.5.0-bin.tar.gz 
+    export PATH=$PATH:$DIR/apache-maven-3.5.0/bin
+    termux-fix-shebang $DIR/apache-maven-3.5.0/bin/mvn
     echo -e "done"
 fi
 
@@ -108,11 +113,11 @@ fi
 # Minecraft Server Lombok Test
 echo "Minecraft Server Lombok Test..."
 cd $DIR && $(git clone https://github.com/voxelwind/voxelwind &>/dev/null)
-echo -e "Enabling error output for this one..."
+echo -e " Enabling error output for this one..."
 
 sleep 3
 
-cd $DIR/voxelwind && $(mvn package | grep "ERROR*")
+cd $DIR/voxelwind && printf "%b\n" "$(mvn package | grep 'ERROR*')"
 
 echo
 
